@@ -16,4 +16,7 @@ export default class Author {
 
   @Column()
   nationality: string;
+
+  @Column({ default: true })
+  active: boolean;
 }

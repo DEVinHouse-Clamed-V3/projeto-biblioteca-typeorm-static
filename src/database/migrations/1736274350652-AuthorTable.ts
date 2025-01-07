@@ -35,6 +35,11 @@ export class AuthorTable1736274350652 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'active',
+            type: 'boolean',
+            default: true,
+          },
+          {
             name: 'created_at',
             type: 'timestamp',
             default: 'now()',
