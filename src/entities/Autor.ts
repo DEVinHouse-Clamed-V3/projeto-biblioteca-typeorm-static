@@ -3,20 +3,20 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('author')
 export default class Author {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column({ type: 'date' })
-  birth_date: Date;
+  birth_date!: Date;
 
   @Column({ type: 'text', nullable: true })
-  biography: string;
+  biography!: string;
 
   @Column()
-  nationality: string;
+  nationality!: string;
 
   @Column({ default: true })
-  active: boolean;
+  active!: boolean;
 }
