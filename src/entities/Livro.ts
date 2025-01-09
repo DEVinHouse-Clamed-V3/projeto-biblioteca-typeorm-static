@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-@Entity("livros")
+@Entity("books")
 export default class Livro {
   @PrimaryGeneratedColumn()
   id: number;
