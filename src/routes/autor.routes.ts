@@ -11,7 +11,7 @@ authorRoutes.get('/', async (req, res) => {
   } catch (error: any) {
     res
       .status(500)
-      .json({ message: 'Error fetching authors', error: error.message });
+      .json({ message: 'Erro ao buscar autores', error: error.message });
   }
 });
 
@@ -23,14 +23,14 @@ authorRoutes.get('/:id', async (req, res) => {
     });
 
     if (!author) {
-      return res.status(404).json({ message: 'Author not found' });
+      return res.status(404).json({ message: 'Autor não encontrado' });
     }
 
     res.status(200).json(author);
   } catch (error: any) {
     res
       .status(500)
-      .json({ message: 'Error fetching author', error: error.message });
+      .json({ message: 'Erro ao buscar autor', error: error.message });
   }
 });
 
@@ -39,7 +39,7 @@ authorRoutes.post('/', async (req, res) => {
     const { name, nationality, biography, birth_date } = req.body;
 
     if (!name || !nationality || !birth_date) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Campos obrigatórios faltando' });
     }
 
     const author = new Author();
@@ -53,7 +53,7 @@ authorRoutes.post('/', async (req, res) => {
   } catch (error: any) {
     res
       .status(500)
-      .json({ message: 'Error creating author', error: error.message });
+      .json({ message: 'Erro ao criar autor', error: error.message });
   }
 });
 
@@ -66,7 +66,7 @@ authorRoutes.put('/:id', async (req, res) => {
     const author = await authorRepository.findOne({ where: { id } });
 
     if (!author) {
-      return res.status(404).json({ message: 'Author not found' });
+      return res.status(404).json({ message: 'Autor não encontrado' });
     }
 
     author.name = name || author.name;
@@ -80,7 +80,7 @@ authorRoutes.put('/:id', async (req, res) => {
   } catch (error: any) {
     res
       .status(500)
-      .json({ message: 'Error updating author', error: error.message });
+      .json({ message: 'Erro ao atualizar autor', error: error.message });
   }
 });
 
@@ -90,14 +90,14 @@ authorRoutes.delete('/:id', async (req, res) => {
     const deleteResult = await AppDataSource.getRepository(Author).delete(id);
 
     if (deleteResult.affected === 0) {
-      return res.status(404).json({ message: 'Author not found' });
+      return res.status(404).json({ message: 'Autor não encontrado' });
     }
 
-    res.status(200).json({ message: 'Author deleted successfully' });
+    res.status(200).json({ message: 'Autor excluído com sucesso' });
   } catch (error: any) {
     res
       .status(500)
-      .json({ message: 'Error deleting author', error: error.message });
+      .json({ message: 'Erro ao excluir autor', error: error.message });
   }
 });
 
