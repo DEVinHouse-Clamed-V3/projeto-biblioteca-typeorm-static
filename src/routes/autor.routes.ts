@@ -1,78 +1,104 @@
 import { Router } from 'express';
 import { AppDataSource } from '../database/data-source';
-import Autor from '../entities/Autor';
+import Author from '../entities/Autor';
 
-const autorRoutes = Router();
+const authorRoutes = Router();
 
-autorRoutes.get('/', async (req, res) => {
+authorRoutes.get('/', async (req, res) => {
   try {
-    const autorRepository = await AppDataSource.getRepository(Autor).find();
-    res.json(autorRepository);
+    const authors = await AppDataSource.getRepository(Author).find();
+    res.status(200).json(authors);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error fetching authors', error: error.message });
   }
 });
 
-autorRoutes.get('/:id', async (req, res) => {
+authorRoutes.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const autorRepository = await AppDataSource.getRepository(Autor).findOne({
+    const author = await AppDataSource.getRepository(Author).findOne({
       where: { id },
     });
-    res.json(autorRepository);
+
+    if (!author) {
+      return res.status(404).json({ message: 'Author not found' });
+    }
+
+    res.status(200).json(author);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error fetching author', error: error.message });
   }
 });
 
-autorRoutes.post('/', async (req, res) => {
+authorRoutes.post('/', async (req, res) => {
   try {
     const { name, nationality, biography, birth_date } = req.body;
 
-    const autor = new Autor();
-    autor.name = name;
-    autor.nationality = nationality;
-    autor.biography = biography;
-    autor.birth_date = birth_date;
+    if (!name || !nationality || !birth_date) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
 
-    const autorRepository = await AppDataSource.getRepository(Autor).save(
-      autor,
-    );
-    res.json(autorRepository);
+    const author = new Author();
+    author.name = name;
+    author.nationality = nationality;
+    author.biography = biography || null;
+    author.birth_date = new Date(birth_date);
+
+    const savedAuthor = await AppDataSource.getRepository(Author).save(author);
+    res.status(201).json(savedAuthor);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error creating author', error: error.message });
   }
 });
 
-autorRoutes.delete('/:id', async (req, res) => {
+authorRoutes.put('/:id', async (req, res) => {
   try {
-    const id = req.params.id;
-    const autorRepository = await AppDataSource.getRepository(Autor).delete(id);
-    res.json(autorRepository);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-autorRoutes.put('/:id', async (req, res) => {
-  try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id, 10);
     const { name, nationality, biography, birth_date, active } = req.body;
 
-    const autorRepository = await AppDataSource.getRepository(Autor).update(
-      id,
-      {
-        name,
-        nationality,
-        biography,
-        birth_date,
-        active,
-      },
-    );
-    res.json(autorRepository);
+    const authorRepository = AppDataSource.getRepository(Author);
+    const author = await authorRepository.findOne({ where: { id } });
+
+    if (!author) {
+      return res.status(404).json({ message: 'Author not found' });
+    }
+
+    author.name = name || author.name;
+    author.nationality = nationality || author.nationality;
+    author.biography = biography || author.biography;
+    author.birth_date = birth_date ? new Date(birth_date) : author.birth_date;
+    author.active = active !== undefined ? active : author.active;
+
+    const updatedAuthor = await authorRepository.save(author);
+    res.status(200).json(updatedAuthor);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error updating author', error: error.message });
   }
 });
 
-export default autorRoutes;
+authorRoutes.delete('/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const deleteResult = await AppDataSource.getRepository(Author).delete(id);
+
+    if (deleteResult.affected === 0) {
+      return res.status(404).json({ message: 'Author not found' });
+    }
+
+    res.status(200).json({ message: 'Author deleted successfully' });
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: 'Error deleting author', error: error.message });
+  }
+});
+
+export default authorRoutes;
